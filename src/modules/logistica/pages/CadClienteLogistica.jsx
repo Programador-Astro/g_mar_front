@@ -91,7 +91,7 @@ const Input = styled.input`
 `;
 
 const Button = styled.button`
-  background-color: ${(props) => (props.primary ? colors.primary : colors.secondary)};
+  background-color: ${(props) => (props.$primary ? colors.primary : colors.secondary)};
   color: #fff;
   padding: 1rem 2rem;
   border: none;
@@ -104,7 +104,7 @@ const Button = styled.button`
   align-self: flex-start;
 
   &:hover:not(:disabled) {
-    background-color: ${(props) => (props.primary ? '#0A3B7A' : '#1565C0')};
+    background-color: ${(props) => (props.$primary ? '#0A3B7A' : '#1565C0')};
   }
 
   &:disabled {
@@ -201,10 +201,9 @@ export default function CadClienteLogistica() {
     const token = localStorage.getItem('token');
     if (!token) { setMessage({ text: 'Erro: Token não encontrado.', type: 'error' }); return; }
 
-    // validação mínima
+    // validação mínima - O endereço do motorista não é mais obrigatório
     if (!jsonData.codigo_externo.trim() || !jsonData.nome.trim() || !jsonData.tell_cadastro.trim()
-      || !jsonData.endereco_nota.trim() || !jsonData.bairro.trim() || !jsonData.cidade.trim()
-      || !jsonData.bairro_motorista.trim() || !jsonData.cidade_motorista.trim()) {
+      || !jsonData.endereco_nota.trim() || !jsonData.bairro.trim() || !jsonData.cidade.trim()) {
       setMessage({ text: 'Preencha todos os campos obrigatórios (*)', type: 'error' });
       return;
     }
@@ -344,12 +343,12 @@ export default function CadClienteLogistica() {
                 <Input type="text" name="numero_motorista" value={jsonData.numero_motorista} onChange={handleJsonChange} />
               </FormGroup>
               <FormGroup>
-                <Label>Bairro* </Label>
-                <Input type="text" name="bairro_motorista" value={jsonData.bairro_motorista} onChange={handleJsonChange} required />
+                <Label>Bairro</Label>
+                <Input type="text" name="bairro_motorista" value={jsonData.bairro_motorista} onChange={handleJsonChange} />
               </FormGroup>
               <FormGroup>
-                <Label>Cidade* </Label>
-                <Input type="text" name="cidade_motorista" value={jsonData.cidade_motorista} onChange={handleJsonChange} required />
+                <Label>Cidade</Label>
+                <Input type="text" name="cidade_motorista" value={jsonData.cidade_motorista} onChange={handleJsonChange} />
               </FormGroup>
               <FormGroup>
                 <Label>Ponto de Referência</Label>
@@ -361,7 +360,7 @@ export default function CadClienteLogistica() {
               </FormGroup>
             </FormGrid>
 
-            <Button type="submit" primary>Cadastrar Cliente</Button>
+            <Button type="submit" $primary>Cadastrar Cliente</Button>
           </form>
         </FormContainer>
       </PageContainer>
