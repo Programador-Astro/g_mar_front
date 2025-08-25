@@ -140,9 +140,10 @@ const TableLink = styled.a`
   }
 `;
 
+// Aqui alteramos para msgType, não passar booleana direto para o DOM
 const Message = styled.p`
   text-align: center;
-  color: ${({ error }) => (error ? "red" : colors.primary)};
+  color: ${({ msgType }) => (msgType === "error" ? "red" : colors.primary)};
   padding: 2rem;
 `;
 
@@ -155,25 +156,24 @@ export default function ClientesPage() {
 
   useEffect(() => {
     const fetchClientes = async () => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    setError("Usuário não autenticado. Por favor, faça login.");
-    setLoading(false);
-    return;
-  }
-  try {
-    const response = await axios.get("/api/logistica/get_clientes", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    // Aqui está a correção:
-    setClientes(response.data.dados);
-  } catch (e) {
-    console.error("Failed to fetch clients:", e);
-    setError("Falha ao buscar clientes. Verifique sua conexão ou tente novamente.");
-  } finally {
-    setLoading(false);
-  }
-};
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Usuário não autenticado. Por favor, faça login.");
+        setLoading(false);
+        return;
+      }
+      try {
+        const response = await axios.get("/api/logistica/get_clientes", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setClientes(response.data.dados);
+      } catch (e) {
+        console.error("Failed to fetch clients:", e);
+        setError("Falha ao buscar clientes. Verifique sua conexão ou tente novamente.");
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchClientes();
   }, []);
 
@@ -193,7 +193,7 @@ export default function ClientesPage() {
           </Header>
 
           {loading && <Message>Carregando...</Message>}
-          {error && <Message error>{error}</Message>}
+          {error && <Message msgType="error">{error}</Message>}
           {!loading && !error && (
             <StyledTable>
               <thead>
