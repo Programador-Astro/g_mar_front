@@ -1,32 +1,39 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from '../modules/auth/pages/LoginPage';
 import HomeLogistica from '../modules/logistica/pages/HomeLogistica';
 import PedidosLogistica from '../modules/logistica/pages/PedidosLogistica';
 import {DetalhesPedidoPage} from '../modules/logistica/pages/DetalhesPedidoPage';
 import CadClienteLogistica from '../modules/logistica/pages/CadClienteLogistica'; 
 import ClientesLogistica from '../modules/logistica/pages/Clientes';
+import DetalhesCliente from '../modules/logistica/pages/DetalhesCliente';
 
+
+import ProtectedRoute from './ProtectedRoute';
 // Importe outros componentes de rotas aqui...
 
 const AppRoutes = () => {
   return (
     <Routes>
+      {/* Rota principal */}
+       <Route path="/" element={<Navigate to="/login" replace />} />
+
       {/* Rota para a página de login */}
       <Route path="/login" element={<LoginPage />} />
 
-      {/* Rota principal ou outras rotas */}
-      <Route path="/" element={<div>Página Inicial</div>} />
-      {/* Rota principal ou outras rotas */}
-      <Route path="/logistica/início" element={<HomeLogistica/>} />
-      {/* Rota principal ou outras rotas */}
-      <Route path="/logistica/pedidos" element={<PedidosLogistica/>} />
-      {/* Rota principal ou outras rotas */}
-      <Route path="/logistica/pedido/:cod_externo" element={<DetalhesPedidoPage/>} />
-      {/* Rota principal ou outras rotas */}
-      <Route path="/logistica/cadastar_clientes" element={<CadClienteLogistica/>} />
-      {/* Rota principal ou outras rotas */}
-      <Route path="/logistica/clientes" element={<ClientesLogistica/>} />
+      
+      {/* Inicio Logistica */}
+      <Route path="/logistica/início" element={<ProtectedRoute><HomeLogistica/></ProtectedRoute>} />
+      {/* */}
+      <Route path="/logistica/pedidos" element={<ProtectedRoute> <PedidosLogistica/></ProtectedRoute>} />
+      {/*  */}
+      <Route path="/logistica/pedido/:cod_externo" element={<ProtectedRoute><DetalhesPedidoPage/></ProtectedRoute>} />
+      {/* */}
+      <Route path="/logistica/cadastar_clientes" element={<ProtectedRoute><CadClienteLogistica/></ProtectedRoute>} />
+      {/*  */}
+      <Route path="/logistica/clientes" element={<ProtectedRoute><ClientesLogistica/></ProtectedRoute>} />
+      {/*  */}
+      <Route path="/logistica/cliente/:codigo_externo" element={<ProtectedRoute><DetalhesCliente/></ProtectedRoute>} />
         
 
 
