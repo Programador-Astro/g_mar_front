@@ -14,7 +14,6 @@ const colors = {
 };
 
 const GlobalStyle = createGlobalStyle`
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
   
   body {
     margin: 0;
@@ -208,7 +207,7 @@ export default function ClientesPage() {
                   clientes.map((cliente) => (
                     <TableRow key={cliente.id}>
                       <TableCell data-label="Código">
-                        <TableLink onClick={() => navigate(`/logistica/clientes/${cliente.id}`)}>
+                        <TableLink onClick={() => navigate(`/logistica/cliente/${cliente.codigo_externo}`)}>
                           {cliente.codigo_externo}
                         </TableLink>
                       </TableCell>
