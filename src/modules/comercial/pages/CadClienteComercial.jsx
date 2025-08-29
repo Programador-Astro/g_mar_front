@@ -160,7 +160,7 @@ const PdfCancelButton = styled.button`
   &:hover { background-color: #aaa; }
 `;
 
-export default function CadClienteLogistica() {
+export default function CadClienteComercial() {
   const [pdfFile, setPdfFile] = useState(null);
   const [jsonData, setJsonData] = useState({
     codigo_externo: '', nome: '', email: '', tell_cadastro: '', tell_motorista: '',
@@ -191,8 +191,8 @@ export default function CadClienteLogistica() {
     }
   };
 
-  const API_URL = '/api/logistica/cadastrar_cliente';
-  const PDF_API_URL = '/api/logistica/cadastrar_cliente';
+  const API_URL = '/api/comercial/cadastrar_cliente';
+  const PDF_API_URL = '/api/omercial/cadastrar_cliente';
 
   // --- Formulário manual ---
   const handleJsonSubmit = async (e) => {
@@ -215,7 +215,9 @@ export default function CadClienteLogistica() {
       setMessage({ text: 'Cliente cadastrado com sucesso!', type: 'success' });
       setJsonData({
         codigo_externo: '', nome: '', email: '', tell_cadastro: '', tell_motorista: '',
-        endereco_nota: '', numero: '', bairro: '', cidade: '', ponto_ref: '', obs: ''
+        endereco_nota: '', numero: '', bairro: '', cidade: '', ponto_ref: '', obs: '',
+        endereco_motorista: '', numero_motorista: '', bairro_motorista: '', cidade_motorista: '',
+        ponto_ref_motorista: '', obs_motorista: '',
       });
     } catch (error) {
       const msg = error.response?.data?.msg || 'Erro ao cadastrar cliente.';
@@ -227,7 +229,7 @@ export default function CadClienteLogistica() {
   const handlePdfUpload = async () => {
     if (!pdfFile) { setPdfUploadMessage("Selecione um PDF antes de enviar."); return; }
 
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     const formData = new FormData();
     formData.append("arquivo", pdfFile);
 
@@ -281,7 +283,7 @@ export default function CadClienteLogistica() {
             <SectionTitle>Dados do Cliente</SectionTitle>
             <FormGrid>
               <FormGroup>
-                <Label>Código* </Label>
+                <Label>Código Externo* </Label>
                 <Input type="text" name="codigo_externo" value={jsonData.codigo_externo} onChange={handleJsonChange} required />
               </FormGroup>
               <FormGroup>
@@ -293,13 +295,16 @@ export default function CadClienteLogistica() {
                 <Input type="email" name="email" value={jsonData.email} onChange={handleJsonChange} />
               </FormGroup>
               <FormGroup>
-                <Label>Telefone</Label>
+                <Label>Telefone (Nota)*</Label>
                 <Input type="tel" name="tell_cadastro" value={jsonData.tell_cadastro} onChange={handleJsonChange} required />
               </FormGroup>
+              <FormGroup>
+                <Label>Telefone (Motorista)</Label>
+                <Input type="tel" name="tell_motorista" value={jsonData.tell_motorista} onChange={handleJsonChange} />
+              </FormGroup>
+            </FormGrid>
 
-            </FormGrid> 
-
-            <SectionTitle>Endereço</SectionTitle>
+            <SectionTitle>Endereço da Nota</SectionTitle>
             <FormGrid>
               <FormGroup>
                 <Label>Endereço* </Label>
@@ -327,7 +332,33 @@ export default function CadClienteLogistica() {
               </FormGroup>
             </FormGrid>
 
-            
+            <SectionTitle>Endereço do Motorista</SectionTitle>
+            <FormGrid>
+              <FormGroup>
+                <Label>Endereço</Label>
+                <Input type="text" name="endereco_motorista" value={jsonData.endereco_motorista} onChange={handleJsonChange} />
+              </FormGroup>
+              <FormGroup>
+                <Label>Número</Label>
+                <Input type="text" name="numero_motorista" value={jsonData.numero_motorista} onChange={handleJsonChange} />
+              </FormGroup>
+              <FormGroup>
+                <Label>Bairro</Label>
+                <Input type="text" name="bairro_motorista" value={jsonData.bairro_motorista} onChange={handleJsonChange} />
+              </FormGroup>
+              <FormGroup>
+                <Label>Cidade</Label>
+                <Input type="text" name="cidade_motorista" value={jsonData.cidade_motorista} onChange={handleJsonChange} />
+              </FormGroup>
+              <FormGroup>
+                <Label>Ponto de Referência</Label>
+                <Input type="text" name="ponto_ref_motorista" value={jsonData.ponto_ref_motorista} onChange={handleJsonChange} />
+              </FormGroup>
+              <FormGroup>
+                <Label>Observações</Label>
+                <Input type="text" name="obs_motorista" value={jsonData.obs_motorista} onChange={handleJsonChange} />
+              </FormGroup>
+            </FormGrid>
 
             <Button type="submit" $primary>Cadastrar Cliente</Button>
           </form>

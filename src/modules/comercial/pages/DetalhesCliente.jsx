@@ -14,7 +14,6 @@ export default function DetalhesCliente() {
   const [editando, setEditando] = useState(false);
   const [formData, setFormData] = useState({});
   const [enderecos, setEnderecos] = useState([]);
-  const [enderecosMotorista, setEnderecosMotorista] = useState([]);
   const [pedidos, setPedidos] = useState([]);
   const [expandedPedido, setExpandedPedido] = useState(null);
 
@@ -30,23 +29,21 @@ export default function DetalhesCliente() {
   });
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     const url = `/api/logistica/get_cliente/${codigo_externo}`;
     axios.get(url, {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => {
-      const dados = res.data.dados;
-      setCliente(dados);
+      setCliente(res.data.dados);
       setFormData({
-        nome: dados.nome || "",
-        codigo_externo: dados.codigo_externo || "",
-        email: dados.email || "",
-        telefone: dados.telefone_cadastro || "",
-        telefone_motorista: dados.telefone_motorista || "",
+        nome: res.data.dados.nome || "",
+        codigo_externo: res.data.dados.codigo_externo || "",
+        email: res.data.dados.email || "",
+        telefone: res.data.dados.telefone_cadastro || "",
+        telefone_motorista: res.data.dados.telefone_motorista || "",
       });
-      setEnderecos(dados.enderecos_adm || []);
-      setEnderecosMotorista(dados.enderecos_motorista || []);
-      setPedidos(dados.pedidos || []);
+      setEnderecos(res.data.dados.enderecos_adm || []);
+      setPedidos(res.data.dados.pedidos || []);
     }).catch(console.error);
   }, [codigo_externo]);
 
@@ -64,17 +61,8 @@ export default function DetalhesCliente() {
     });
   };
 
-  const handleEnderecoMotoristaChange = (index, e) => {
-    const { name, value } = e.target;
-    setEnderecosMotorista(prev => {
-      const novos = [...prev];
-      novos[index] = { ...novos[index], [name]: value };
-      return novos;
-    });
-  };
-
   const handleSalvar = () => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     const payload = {
       cliente: {
@@ -102,18 +90,18 @@ export default function DetalhesCliente() {
   };
 
   const handleCadastrarEndereco = () => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     const payload = {
       ...novoEndereco,
       cliente_id: cliente?.id
     };
 
-    axios.post(`/api/logistica/cadastrar_endereco_motorista/${codigo_externo}`, payload, {
+    axios.post(`1'123`, payload, {
       headers: { Authorization: `Bearer ${token}` }
-    }).then((res) => {
+    }).then(() => {
       setOpenModal(false);
       setNovoEndereco({ cidade: "", bairro: "", endereco: "", numero: "", ponto_ref: "", obs: "" });
-      setEnderecosMotorista(prev => [...prev, res.data]); // ou payload, se o back não retorna o novo com ID
+      setEnderecos(prev => [...prev, payload]);
     }).catch(console.error);
   };
 
@@ -146,8 +134,8 @@ export default function DetalhesCliente() {
         </Box>
       </Paper>
 
-      {/* Endereços Administrativos */}
-      <Paper sx={{ p: 4, maxWidth: 900, mx: "auto", bgcolor: "#fff", borderRadius: 2, mb: 6 }}>
+      {/* Endereços */}
+      <Paper sx={{ p: 4, maxWidth: 900, mx: "auto", bgcolor: "#fff", boxShadow: "0 4px 15px rgba(0,0,0,0.1)", borderRadius: 2, mb: 6 }}>
         <Typography variant="h5" gutterBottom sx={{ color: "#003366", fontWeight: "bold" }}>
           Endereços Administrativos
         </Typography>
@@ -184,70 +172,7 @@ export default function DetalhesCliente() {
         )}
       </Paper>
 
-      {/* Endereços Adicionais */}
-      <Paper sx={{ p: 4, maxWidth: 900, mx: "auto", bgcolor: "#fff", borderRadius: 2, mb: 6 }}>
-        <Typography variant="h5" gutterBottom sx={{ color: "#003366", fontWeight: "bold" }}>
-          Endereços Adicionais
-        </Typography>
-
-        {enderecosMotorista.length === 0 ? (
-          <Typography>Nenhum endereço encontrado.</Typography>
-        ) : (
-          <Table>
-            <TableHead sx={{ bgcolor: "#e0f0ff" }}>
-              <TableRow>
-                <TableCell>Endereço</TableCell>
-                <TableCell>Número</TableCell>
-                <TableCell>Ponto de Referência</TableCell>
-                {editando && <TableCell>Observações</TableCell>}
-                <TableCell>Mapa</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {enderecosMotorista.map((end, i) => (
-                <TableRow key={end.id || i}>
-                  <TableCell>{editando ? <TextField name="endereco" value={end.endereco} onChange={e => handleEnderecoMotoristaChange(i, e)} fullWidth variant="standard" sx={{ bgcolor: "#e6f0ff" }} /> : end.endereco}</TableCell>
-                  <TableCell>{editando ? <TextField name="numero" value={end.numero} onChange={e => handleEnderecoMotoristaChange(i, e)} variant="standard" sx={{ width: 80, bgcolor: "#e6f0ff" }} /> : end.numero}</TableCell>
-                  <TableCell>{editando ? <TextField name="ponto_ref" value={end.ponto_ref} onChange={e => handleEnderecoMotoristaChange(i, e)} fullWidth variant="standard" sx={{ bgcolor: "#e6f0ff" }} /> : (end.ponto_ref || "-")}</TableCell>
-                  {editando && (<TableCell><TextField name="obs" value={end.obs || ""} onChange={e => handleEnderecoMotoristaChange(i, e)} fullWidth variant="standard" sx={{ bgcolor: "#e6f0ff" }} /></TableCell>)}
-                  <TableCell>
-                    <Link href={`https://www.google.com/maps/search/?api=1&query=${end.latitude},${end.longitude}`} target="_blank" rel="noopener noreferrer" sx={{ color: "#0073e6" }}>
-                      Ver no mapa
-                    </Link>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </Paper>
-
-
-
-
-      {/* Botão cadastrar endereço */}
-      <Box textAlign="center" mb={6}>
-        <Button variant="contained" sx={{ bgcolor: "#28a745", ":hover": { bgcolor: "#218838" } }} onClick={() => setOpenModal(true)}>
-          Cadastrar novo endereço
-        </Button>
-      </Box>
-
-      {/* Modal novo endereço */}
-      <Modal open={openModal} onClose={() => setOpenModal(false)}>
-        <Box sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 400, bgcolor: "white", boxShadow: 24, p: 4, borderRadius: 2 }}>
-          <Typography variant="h6" mb={2}>Cadastrar novo endereço</Typography>
-          <TextField fullWidth label="Cidade" name="cidade" value={novoEndereco.cidade} onChange={e => setNovoEndereco({ ...novoEndereco, cidade: e.target.value })} sx={{ mb: 2 }} />
-          <TextField fullWidth label="Bairro" name="bairro" value={novoEndereco.bairro} onChange={e => setNovoEndereco({ ...novoEndereco, bairro: e.target.value })} sx={{ mb: 2 }} />
-          <TextField fullWidth label="Endereço" name="endereco" value={novoEndereco.endereco} onChange={e => setNovoEndereco({ ...novoEndereco, endereco: e.target.value })} sx={{ mb: 2 }} />
-          <TextField fullWidth label="Número" name="numero" value={novoEndereco.numero} onChange={e => setNovoEndereco({ ...novoEndereco, numero: e.target.value })} sx={{ mb: 2 }} />
-          <TextField fullWidth label="Ponto de Referência" name="ponto_ref" value={novoEndereco.ponto_ref} onChange={e => setNovoEndereco({ ...novoEndereco, ponto_ref: e.target.value })} sx={{ mb: 2 }} />
-          <TextField fullWidth label="Observações" name="obs" value={novoEndereco.obs} onChange={e => setNovoEndereco({ ...novoEndereco, obs: e.target.value })} sx={{ mb: 2 }} />
-          <Button fullWidth variant="contained" onClick={handleCadastrarEndereco}>
-            Salvar Endereço
-          </Button>
-        </Box>
-      </Modal>
-          {/* Pedidos */}
+      {/* Pedidos */}
       <Paper sx={{ p: 4, maxWidth: 900, mx: "auto", bgcolor: "#fff", boxShadow: "0 4px 15px rgba(0,0,0,0.1)", borderRadius: 2, mb: 6 }}>
         <Typography variant="h5" gutterBottom sx={{ color: "#003366", fontWeight: "bold" }}>
           Pedidos
@@ -307,7 +232,29 @@ export default function DetalhesCliente() {
           </Table>
         )}
       </Paper>
-    
+
+      {/* Botão cadastrar endereço */}
+      <Box textAlign="center" mb={6}>
+        <Button variant="contained" sx={{ bgcolor: "#28a745", ":hover": { bgcolor: "#218838" } }} onClick={() => setOpenModal(true)}>
+          Cadastrar novo endereço
+        </Button>
+      </Box>
+
+      {/* Modal novo endereço */}
+      <Modal open={openModal} onClose={() => setOpenModal(false)}>
+        <Box sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 400, bgcolor: "white", boxShadow: 24, p: 4, borderRadius: 2 }}>
+          <Typography variant="h6" mb={2}>Cadastrar novo endereço</Typography>
+          <TextField fullWidth label="Cidade" name="cidade" value={novoEndereco.cidade} onChange={e => setNovoEndereco({ ...novoEndereco, cidade: e.target.value })} sx={{ mb: 2 }} />
+          <TextField fullWidth label="Bairro" name="bairro" value={novoEndereco.bairro} onChange={e => setNovoEndereco({ ...novoEndereco, bairro: e.target.value })} sx={{ mb: 2 }} />
+          <TextField fullWidth label="Endereço" name="endereco" value={novoEndereco.endereco} onChange={e => setNovoEndereco({ ...novoEndereco, endereco: e.target.value })} sx={{ mb: 2 }} />
+          <TextField fullWidth label="Número" name="numero" value={novoEndereco.numero} onChange={e => setNovoEndereco({ ...novoEndereco, numero: e.target.value })} sx={{ mb: 2 }} />
+          <TextField fullWidth label="Ponto de Referência" name="ponto_ref" value={novoEndereco.ponto_ref} onChange={e => setNovoEndereco({ ...novoEndereco, ponto_ref: e.target.value })} sx={{ mb: 2 }} />
+          <TextField fullWidth label="Observações" name="obs" value={novoEndereco.obs} onChange={e => setNovoEndereco({ ...novoEndereco, obs: e.target.value })} sx={{ mb: 2 }} />
+          <Button fullWidth variant="contained" onClick={handleCadastrarEndereco}>
+            Salvar Endereço
+          </Button>
+        </Box>
+      </Modal>
     </Box>
   );
 }

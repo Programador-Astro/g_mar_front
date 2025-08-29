@@ -58,7 +58,7 @@ export default function Navbar() {
     e.target.style.color = colors.white;
   };
   
-  const navItems = ['Inicio', 'Pedidos',  'Clientes','Rotas', 'Veículos', 'Usuários', 'Estoque'];
+  const navItems = ['Inicio', 'Pedidos',  'Clientes'];
 
   return (
     <nav style={navStyles}>
@@ -67,7 +67,7 @@ export default function Navbar() {
           {navItems.map((item) => (
             <li key={item}>
               <a
-                href={`/logistica/${item.toLowerCase().replace('ç', 'c')}`}
+                href={`/comercial/${item.toLowerCase().replace('ç', 'c')}`}
                 style={navItemLinkStyles}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}

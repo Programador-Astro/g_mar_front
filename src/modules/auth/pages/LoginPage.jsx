@@ -104,27 +104,26 @@ function LoginPage() {
     setMessage('');
     setLoading(true);
 
-    try {
-      const response = await axios.post('/auth/login', {
-        email,
-        pwd,
-      });
+try {
+      const response = await axios.post('/auth/login', { email, pwd });
 
       if (response.data.access_token) {
-        // Salva o token no localStorage
-        localStorage.setItem('token', response.data.access_token);
+        // Salva o token e os dados adicionais no sessionStorage
+        sessionStorage.setItem('token', response.data.access_token);
+        sessionStorage.setItem('setor', response.data.setor);
+        localStorage.setItem('token',response.data.access_token);
         setMessage('Login realizado com sucesso! Redirecionando...');
         
-        // Redireciona o usuário para a página de logística
-        // useNavigate é a forma moderna de fazer redirecionamento no React Router
-        navigate('/logistica/início');
+        // Redireciona o usuário para a página inicial conforme o setor
+        const setor = response.data.setor;
 
+        navigate(`/${setor}/inicio`);
       } else {
         setMessage('Erro inesperado na resposta da API.');
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        setMessage('Usuario ou Senha Incorretos. Verifique e tente novamente.');
+        setMessage('Usuário ou Senha Incorretos. Verifique e tente novamente.');
       } else {
         setMessage('Erro ao conectar com o servidor. Tente novamente mais tarde.');
         console.error('Erro de login:', error);
